@@ -40,7 +40,7 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const host = 'http://127.0.0.1:5500/public/index.html'
+  const host = 'https://short-my-url.vercel.app/'
   const searchParams = new URLSearchParams(window.location.search);
   console.log(searchParams)
   if (searchParams.has('i')) {
