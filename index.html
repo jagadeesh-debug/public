@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="url.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="heading">Shorten Your URL Here</h1>
+  </header>
+  <section class="linkinput">
+    <div class="large_url">
+      <input type="url" id="longurl" placeholder="Enter your long URL here" />
+      <button class="submit" id="shorten">Short it</button>
+    </div>
+  </section>
+  <div class="short_url" id="shorturl"></div>
+  
+</body>
+<script type="module">
+  // Import Firebase SDK functions
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, setDoc,getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-lite.js';
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTpVqgv_zb6z4w4o_OoWOlaBX_39vjl94",
+    authDomain: "short-url-2a24d.firebaseapp.com",
+    projectId: "short-url-2a24d",
+    storageBucket: "short-url-2a24d.appspot.com",
+    messagingSenderId: "459209474053",
+    appId: "1:459209474053:web:83a266714b29c76c6c1c6c",
+    measurementId: "G-95Z7MMDMNH"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const host = 'http://127.0.0.1:5500/public/index.html'
+  const searchParams = new URLSearchParams(window.location.search);
+  console.log(searchParams)
+  if (searchParams.has('i')) {
+    console.log('hy')
+    let pindex = searchParams.get('i')
+    let originalUrl = ''
+    const docRef = doc(db, "urls", "mapping");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      let result = docSnap.data();
+      const urls = result.list;
+      let flag = false
+      for (let i = 0; i < urls.length; i++) {
+
+        if (urls[i].index == pindex) {
+          originalUrl = urls[i].longurl
+          flag = true
+          break;
+        }
+      }
+      if (flag) {
+        window.location.href = originalUrl
+
+      }
+      else {
+        window.location.href = host
+
+      }
+    }
+    else {
+      window.location.href = host
+    }
+  }
+
+  async function mkShortUrl() {
+    const LargeUrl = document.getElementById('longurl').value
+    if (LargeUrl.includes(host)) {
+      document.getElementById('shorturl').innerHTML = '<a href="' + LargeUrl + '">' + LargeUrl + '</a>'
+    }
+    else {
+      const docRef = doc(db, "urls", "mapping");
+      const docSnap = await getDoc(docRef);
+      let index = "";
+
+      if (docSnap.exists()) {
+        let result = docSnap.data();
+        const urls = result.list;
+        let flag = false
+        for (let i = 0; i < urls.length;i++) {
+
+          if (urls[i].longurl == LargeUrl) {
+            index = urls[i].index
+            flag = true
+            break;
+          }
+        }
+        if (!flag) {
+          index = urls.length+ 1;
+          urls.push({ index: index, longurl: LargeUrl })
+          await setDoc(doc(db, 'urls', 'mapping'), { list: urls })
+        }
+      }
+      else {
+        index = 0;
+        await setDoc(doc(db, 'urls', 'mapping'), { list : [{ index, longurl: LargeUrl }] })
+      }
+      document.getElementById('shorturl').innerHTML = '<a href="' + host + '?i=' + index + '">' + host + '?i=' + index + '</a>'
+
+    }
+  }
+  document.getElementById('shorten').addEventListener('click',mkShortUrl)
+</script>
+
+</html>
