@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="url.css">
-  <title>Document</title>
+  <title>URL Shortener</title>
 </head>
 
 <body>
@@ -19,206 +19,67 @@
     </div>
   </section>
   <div class="short_url" id="shorturl"></div>
-  
-</body>
-<script type="module">
-  // Import Firebase SDK functions
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, setDoc,getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-lite.js';
 
-  // Your web app's Firebase configuration
-<!DOCTYPE html>
-<html lang="en">
+  <script type="module">
+    // Import Firebase SDK functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getFirestore, setDoc, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-lite.js";
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="url.css">
-  <title>Document</title>
-</head>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVMV-11DnKCJmNq1cgodYCJhP00Ooz870",
+      authDomain: "urlshortner-ee11f.firebaseapp.com",
+      projectId: "urlshortner-ee11f",
+      storageBucket: "urlshortner-ee11f.appspot.com",
+      messagingSenderId: "899366864699",
+      appId: "1:899366864699:web:b57613e9e585634641591e",
+      measurementId: "G-S9HQJ0QCVS"
+    };
 
-<body>
-  <header class="header">
-    <h1 class="heading">Shorten Your URL Here</h1>
-  </header>
-  <section class="linkinput">
-    <div class="large_url">
-      <input type="url" id="longurl" placeholder="Enter your long URL here" />
-      <button class="submit" id="shorten">Short it</button>
-    </div>
-  </section>
-  <div class="short_url" id="shorturl"></div>
-  
-</body>
-<script type="module">
-  // Import Firebase SDK functions
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, setDoc,getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-lite.js';
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const host = "https://short-my-url.vercel.app/";
+    const searchParams = new URLSearchParams(window.location.search);
 
-  // Your web app's Firebase configuration
- const firebaseConfig = {
-  apiKey: "AIzaSyAVMV-11DnKCJmNq1cgodYCJhP00Ooz870",
-  authDomain: "urlshortner-ee11f.firebaseapp.com",
-  projectId: "urlshortner-ee11f",
-  storageBucket: "urlshortner-ee11f.firebasestorage.app",
-  messagingSenderId: "899366864699",
-  appId: "1:899366864699:web:b57613e9e585634641591e",
-  measurementId: "G-S9HQJ0QCVS"
-};
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const host = 'https://short-my-url.vercel.app/'
-  const searchParams = new URLSearchParams(window.location.search);
-  console.log(searchParams)
-  if (searchParams.has('i')) {
-    console.log('hy')
-    let pindex = searchParams.get('i')
-    let originalUrl = ''
-    const docRef = doc(db, "urls", "mapping");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      let result = docSnap.data();
-      const urls = result.list;
-      let flag = false
-      for (let i = 0; i < urls.length; i++) {
-
-        if (urls[i].index == pindex) {
-          originalUrl = urls[i].longurl
-          flag = true
-          break;
-        }
-      }
-      if (flag) {
-        window.location.href = originalUrl
-
-      }
-      else {
-        window.location.href = host
-
-      }
-    }
-    else {
-      window.location.href = host
-    }
-  }
-
-  async function mkShortUrl() {
-    const LargeUrl = document.getElementById('longurl').value
-    if (LargeUrl.includes(host)) {
-      document.getElementById('shorturl').innerHTML = '<a href="' + LargeUrl + '">' + LargeUrl + '</a>'
-    }
-    else {
+    if (searchParams.has('i')) {
+      const pindex = searchParams.get('i');
       const docRef = doc(db, "urls", "mapping");
       const docSnap = await getDoc(docRef);
-      let index = "";
-
       if (docSnap.exists()) {
-        let result = docSnap.data();
-        const urls = result.list;
-        let flag = false
-        for (let i = 0; i < urls.length;i++) {
-
-          if (urls[i].longurl == LargeUrl) {
-            index = urls[i].index
-            flag = true
-            break;
-          }
-        }
-        if (!flag) {
-          index = urls.length+ 1;
-          urls.push({ index: index, longurl: LargeUrl })
-          await setDoc(doc(db, 'urls', 'mapping'), { list: urls })
-        }
-      }
-      else {
-        index = 0;
-        await setDoc(doc(db, 'urls', 'mapping'), { list : [{ index, longurl: LargeUrl }] })
-      }
-      document.getElementById('shorturl').innerHTML = '<a href="' + host + '?i=' + index + '">' + host + '?i=' + index + '</a>'
-
-    }
-  }
-  document.getElementById('shorten').addEventListener('click',mkShortUrl)
-</script>
-
-</html>
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const host = 'https://short-my-url.vercel.app/'
-  const searchParams = new URLSearchParams(window.location.search);
-  console.log(searchParams)
-  if (searchParams.has('i')) {
-    console.log('hy')
-    let pindex = searchParams.get('i')
-    let originalUrl = ''
-    const docRef = doc(db, "urls", "mapping");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      let result = docSnap.data();
-      const urls = result.list;
-      let flag = false
-      for (let i = 0; i < urls.length; i++) {
-
-        if (urls[i].index == pindex) {
-          originalUrl = urls[i].longurl
-          flag = true
-          break;
-        }
-      }
-      if (flag) {
-        window.location.href = originalUrl
-
-      }
-      else {
-        window.location.href = host
-
+        const urls = docSnap.data().list;
+        const matchedUrl = urls.find(url => url.index == pindex);
+        window.location.href = matchedUrl ? matchedUrl.longurl : host;
+      } else {
+        window.location.href = host;
       }
     }
-    else {
-      window.location.href = host
-    }
-  }
 
-  async function mkShortUrl() {
-    const LargeUrl = document.getElementById('longurl').value
-    if (LargeUrl.includes(host)) {
-      document.getElementById('shorturl').innerHTML = '<a href="' + LargeUrl + '">' + LargeUrl + '</a>'
-    }
-    else {
-      const docRef = doc(db, "urls", "mapping");
-      const docSnap = await getDoc(docRef);
-      let index = "";
+    async function mkShortUrl() {
+      const LargeUrl = document.getElementById('longurl').value;
+      if (LargeUrl.includes(host)) {
+        document.getElementById('shorturl').innerHTML = `<a href="${LargeUrl}">${LargeUrl}</a>`;
+      } else {
+        const docRef = doc(db, "urls", "mapping");
+        const docSnap = await getDoc(docRef);
+        let index = "";
+        let urls = docSnap.exists() ? docSnap.data().list : [];
+        const existing = urls.find(url => url.longurl === LargeUrl);
 
-      if (docSnap.exists()) {
-        let result = docSnap.data();
-        const urls = result.list;
-        let flag = false
-        for (let i = 0; i < urls.length;i++) {
-
-          if (urls[i].longurl == LargeUrl) {
-            index = urls[i].index
-            flag = true
-            break;
-          }
+        if (existing) {
+          index = existing.index;
+        } else {
+          index = urls.length + 1;
+          urls.push({ index, longurl: LargeUrl });
+          await setDoc(docRef, { list: urls });
         }
-        if (!flag) {
-          index = urls.length+ 1;
-          urls.push({ index: index, longurl: LargeUrl })
-          await setDoc(doc(db, 'urls', 'mapping'), { list: urls })
-        }
-      }
-      else {
-        index = 0;
-        await setDoc(doc(db, 'urls', 'mapping'), { list : [{ index, longurl: LargeUrl }] })
-      }
-      document.getElementById('shorturl').innerHTML = '<a href="' + host + '?i=' + index + '">' + host + '?i=' + index + '</a>'
 
+        document.getElementById('shorturl').innerHTML = `<a href="${host}?i=${index}">${host}?i=${index}</a>`;
+      }
     }
-  }
-  document.getElementById('shorten').addEventListener('click',mkShortUrl)
-</script>
+
+    document.getElementById('shorten').addEventListener('click', mkShortUrl);
+  </script>
+</body>
 
 </html>
